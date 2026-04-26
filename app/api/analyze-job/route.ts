@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { DEMO_USER_ID } from "@/lib/constants";
-import { openai, OPENAI_MODEL } from "@/lib/openai";
+import { groq, GROQ_MODEL } from "@/lib/groq";
 import { buildJobMatchPrompt } from "@/lib/prompts";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Job, Profile } from "@/types";
@@ -84,18 +84,10 @@ export async function POST(req: Request) {
 
     const prompt = buildJobMatchPrompt(profile, job);
 
-    const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      temperature: 0.2,
-      response_format: {
-        type: "json_object",
-      },
+    const completion = await groq.chat.completions.create({
+      model: GROQ_MODEL,
+      max_tokens: 1024,
       messages: [
-        {
-          role: "system",
-          content:
-            "You are a strict job matching assistant. Always return valid JSON only.",
-        },
         {
           role: "user",
           content: prompt,
